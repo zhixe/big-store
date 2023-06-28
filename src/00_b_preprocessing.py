@@ -37,6 +37,13 @@ sheet_names = excel_data.sheet_names
 print("\n")
 logging.info("[[ DATA PREPROCESSING ]]")
 logging.info("Parsing Excel to CSV format.")
+
+# Remove existing CSV files
+for file_name in os.listdir(csvDir):
+    if file_name.endswith('.csv'):
+        os.remove(os.path.join(csvDir, file_name))
+        logging.info(f"Existing CSV file {file_name} removed.")
+
 # Iterate over each sheet and export to CSV
 for sheet_name in sheet_names:
     # Read the sheet data

@@ -6,7 +6,6 @@ from sqlalchemy import create_engine, text
 from dotenv import load_dotenv
 from datetime import datetime
 
-# THIS SRC CODE FOR WINDOWS ENVIRONMENT ONLY
 # Parse the .env file and then load all the variables found as environment variables.
 load_dotenv("C:/Users/datamicron/Documents/Project/big_store/.env")
 datasetName = "sales"
@@ -24,7 +23,7 @@ logging.getLogger().addHandler(console_handler)
 
 
 class CSVToMySQL:
-    def __init__(self, csv_file): # Class variables
+    def __init__(self, csv_file):
         self.csv_file = csv_file
         self.table_name = datasetName
         self.mysql_host = os.getenv("mysqlHost")
@@ -48,9 +47,6 @@ class CSVToMySQL:
                 # Remove any special characters or spaces from the column name
                 variable_name = ''.join(e for e in column_name if e.isalnum())
                 variables[variable_name] = column_name
-            
-        self.rowID= 
-
         return variables
 
     def detect_data_type(self, values):
@@ -100,10 +96,11 @@ class CSVToMySQL:
                 create_table_query = f"""
                 CREATE TABLE IF NOT EXISTS {self.mysql_database}.{self.table_name} (
                     {', '.join(f"`{variable}` {self.get_column_type(variable)}" for variable in self.variables.values())},
-                    `Original Price` DOUBLE,
-                    Cost DOUBLE
+                    original_price DOUBLE,
+                    cost DOUBLE
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPRESSED
                 """
+
                 connection.execute(text(create_table_query))
 
             logging.info(f"[[ {self.table_name.upper()} ]]")
@@ -115,6 +112,7 @@ class CSVToMySQL:
     def get_column_type(self, variable):
         values = [row[variable] for row in csv.DictReader(open(self.csv_file))]
         column_type = self.detect_data_type(values)
+        
         if column_type == datetime:
             return 'DATETIME'
         elif column_type == int:
@@ -122,7 +120,13 @@ class CSVToMySQL:
         elif column_type == float:
             return 'DOUBLE'
         else:
-            return 'VARCHAR(255)'
+            max_length = max(len(str(value)) for value in values)
+            if max_length <= 10:
+                return f'CHAR({max_length})'
+            elif max_length <= 100:
+                return f'VARCHAR({max_length})'
+            else:
+                return 'TEXT'
 
     def extract_from_csv(self):
         try:
@@ -151,11 +155,11 @@ class CSVToMySQL:
                 # Update original_price and cost columns
                 update_query = f"""
                 UPDATE {self.mysql_database}.{self.table_name}
-                SET `Original Price` = CASE
+                SET original_price = CASE
                     WHEN discount = 1 THEN sales
-                    ELSE (Sales / NULLIF(Quantity * (1 - Discount), 0))
+                    ELSE (sales / NULLIF(quantity * (1 - discount), 0))
                 END,
-                cost = (Sales - Profit)
+                cost = (sales - profit)
                 """
                 connection.execute(text(update_query))
 
@@ -166,7 +170,6 @@ class CSVToMySQL:
             )
             raise
 
-
 if __name__ == "__main__":
-    csv_file = fr"C:\Users\datamicron\Documents\Sample Dataset\CSV\{datasetName}.csv"  # Define the CSV file path
+    csv_file = fr"C:\Users\datamicron\Documents\Sample Dataset\CSV\test_{datasetName}.csv"  # Define the CSV file path
     csv_to_mysql = CSVToMySQL(csv_file)  # Create an instance of CSVToMySQL and pass the necessary parameters

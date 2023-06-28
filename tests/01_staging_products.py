@@ -134,7 +134,7 @@ if __name__ == "__main__":
     # csv_file = fr'/mnt/c/Users/datamicron/Documents/Sample Dataset/CSV/{datasetName}.csv'
 
     # WINDOWS
-    csv_file = fr'C:\Users\datamicron\Documents\Sample Dataset\CSV\{datasetName}.csv'
+    csv_file = fr'C:\Users\datamicron\Documents\Sample Dataset\CSV\test_{datasetName}.csv'
 
     # Create an instance of CSVToMySQL and pass the necessary parameters
     csv_to_mysql = CSVToMySQL(csv_file)
