@@ -3,11 +3,8 @@ import logging
 from datetime import datetime
 
 # Set up logging configuration
-# WINDOWS
-log_file = f"C:/Users/datamicron/Documents/vscode/house_pricing/logs/log_TEST_staging_XLSX_conversion_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
+log_file = f"C:/Users/datamicron/Documents/Project/big_store/logs/log_TEST_staging_XLSX_conversion_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
 
-# WSL
-# log_file = f"/mnt/c/Users/datamicron/Documents/vscode/house_pricing/logs/log_TEST_staging_XLSX_conversion_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s", filename=log_file)
 
 # Add a StreamHandler to print log messages to the console
@@ -38,10 +35,6 @@ if __name__ == "__main__":
     #  WINDOWS
     xls_file = r'C:\Users\datamicron\Documents\Sample Dataset\XLS\Sample - Big Store.xls'
     xlsx_file = r'C:\Users\datamicron\Documents\Sample Dataset\Sample - Big Store.xlsx'
-
-    # WSL
-    # xls_file = r'/mnt/c/Users/datamicron/Documents/Sample Dataset/XLS/Sample - Big Store.xls'
-    # xlsx_file = r'/mnt/c/Users/datamicron/Documents/Sample Dataset/Sample - Big Store.xlsx'
 
     convert_xls_to_xlsx(xls_file, xlsx_file)
     logging.info("File format converted successfully.")

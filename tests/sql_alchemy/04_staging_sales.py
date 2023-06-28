@@ -6,13 +6,12 @@ from sqlalchemy import create_engine, text
 from dotenv import load_dotenv
 from datetime import datetime
 
-# THIS SRC CODE FOR WINDOWS ENVIRONMENT ONLY
 # Parse the .env file and then load all the variables found as environment variables.
-load_dotenv("C:/Users/datamicron/Documents/vscode/house_pricing/.env")
+load_dotenv("C:/Users/datamicron/Documents/Project/big_store/.env")
 datasetName = "sales"
 
 # Set up logging
-log_file = fr"C:/Users/datamicron/Documents/vscode/house_pricing/logs/log_TEST_staging_{datasetName}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
+log_file = fr"C:/Users/datamicron/Documents/Project/big_store/logs/log_TEST_staging_{datasetName}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s", filename=log_file)
 
 # Add a StreamHandler to print log messages to the console
@@ -24,7 +23,7 @@ logging.getLogger().addHandler(console_handler)
 
 
 class CSVToMySQL:
-    def __init__(self, csv_file): # Class variables
+    def __init__(self, csv_file):
         self.csv_file = csv_file
         self.table_name = datasetName
         self.mysql_host = os.getenv("mysqlHost")
@@ -48,9 +47,6 @@ class CSVToMySQL:
                 # Remove any special characters or spaces from the column name
                 variable_name = ''.join(e for e in column_name if e.isalnum())
                 variables[variable_name] = column_name
-            
-        # {', '.join(f"`{variable}` {self.get_column_type(variable)}" for variable in self.variables.values())}
-
         return variables
 
     def detect_data_type(self, values):
@@ -100,8 +96,8 @@ class CSVToMySQL:
                 create_table_query = f"""
                 CREATE TABLE IF NOT EXISTS {self.mysql_database}.{self.table_name} (
                     {', '.join(f"`{variable}` {self.get_column_type(variable)}" for variable in self.variables.values())},
-                    `Original Price` DOUBLE,
-                    Cost DOUBLE
+                    original_price DOUBLE,
+                    cost DOUBLE
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=COMPRESSED
                 """
                 connection.execute(text(create_table_query))
@@ -158,11 +154,11 @@ class CSVToMySQL:
                 # Update original_price and cost columns
                 update_query = f"""
                 UPDATE {self.mysql_database}.{self.table_name}
-                SET `Original Price` = CASE
+                SET original_price = CASE
                     WHEN discount = 1 THEN sales
-                    ELSE (Sales / NULLIF(Quantity * (1 - Discount), 0))
+                    ELSE (sales / NULLIF(quantity * (1 - discount), 0))
                 END,
-                cost = (Sales - Profit)
+                cost = (sales - profit)
                 """
                 connection.execute(text(update_query))
 
@@ -173,35 +169,6 @@ class CSVToMySQL:
             )
             raise
 
-    def update_table(self):
-        try:
-            # Create a database connection
-            engine = create_engine(
-                f"mysql+mysqlconnector://{self.mysql_username}:{self.mysql_password}@{self.mysql_host}:{self.mysql_port}/{self.mysql_database}"
-            )
-
-            # Truncate the table to avoid duplicates
-            with engine.begin() as connection:
-                # Update original_price and cost columns
-                update_query = f"""
-                UPDATE {self.mysql_database}.{self.table_name}
-                SET `Original Price` = CASE
-                    WHEN discount = 1 THEN sales
-                    ELSE (Sales / NULLIF(Quantity * (1 - Discount), 0))
-                END,
-                cost = (Sales - Profit)
-                """
-                connection.execute(text(update_query))
-
-            logging.info("Update table successfully.")
-        except Exception as error:
-            logging.error(
-                f"An error occurred while updating table from {self.csv_file} to {self.table_name}: {error}"
-            )
-            raise
-
-
-
 if __name__ == "__main__":
-    csv_file = fr"C:\Users\datamicron\Documents\Sample Dataset\CSV\{datasetName}.csv"  # Define the CSV file path
+    csv_file = fr"C:\Users\datamicron\Documents\Sample Dataset\CSV\test_{datasetName}.csv"  # Define the CSV file path
     csv_to_mysql = CSVToMySQL(csv_file)  # Create an instance of CSVToMySQL and pass the necessary parameters

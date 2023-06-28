@@ -5,18 +5,11 @@ from dotenv import load_dotenv
 import logging
 from datetime import datetime
 
-# WSL
-# load_dotenv("/mnt/c/Users/datamicron/Documents/vscode/house_pricing/.env")
-# WINDOWS
-load_dotenv("C:/Users/datamicron/Documents/vscode/house_pricing/.env")
+load_dotenv("C:/Users/datamicron/Documents/Project/big_store/.env")
 datasetName="customers"
 
 # Set up logging configuration
-# WSL
-# log_file = f"/mnt/c/Users/datamicron/Documents/vscode/house_pricing/logs/log_TEST_staging__{datasetName}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
-
-# WINDOWS
-log_file = fr"C:/Users/datamicron/Documents/vscode/house_pricing/logs/log_TEST_staging__{datasetName}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
+log_file = fr"C:/Users/datamicron/Documents/Project/big_store/logs/log_TEST_staging__{datasetName}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s", filename=log_file)
 
 # Add a StreamHandler to print log messages to the console
@@ -196,11 +189,7 @@ class CSVToMySQL:
 
 if __name__ == "__main__":
     # Specify the CSV file
-    # WSL
-    # csv_file = fr'/mnt/c/Users/datamicron/Documents/Sample Dataset/CSV/{datasetName}.csv'
-
-    # WINDOWS
-    csv_file = fr'C:\Users\datamicron\Documents\Sample Dataset\CSV\{datasetName}.csv'
+    csv_file = fr'C:\Users\datamicron\Documents\Sample Dataset\CSV\test_{datasetName}.csv'
 
     # Create an instance of CSVToMySQL and pass the necessary parameters
     csv_to_mysql = CSVToMySQL(csv_file)
